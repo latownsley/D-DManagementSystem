@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classes - DnD Project Management</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Classes</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="players.html">Players</a></li>
+                <li><a href="classes.html">Classes</a></li>
+                <li><a href="races.html">Races</a></li>
+                <li><a href="skills.html">Skills</a></li>
+                <li><a href="inventories.html">Inventories</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Available Classes</h2>
+        <table id="classesTable">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Hit Die</th>
+                    <th>Stat Bonus</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Rows will be populated dynamically -->
+            </tbody>
+        </table>
+
+        <h3>Add a New Class</h3>
+        <form id="addClassForm">
+            <label for="description">Description:</label>
+            <input type="text" id="description" name="description" required>
+            <label for="hitDie">Hit Die:</label>
+            <input type="number" id="hitDie" name="hitDie" required>
+            <label for="statBonus">Stat Bonus:</label>
+            <input type="number" id="statBonus" name="statBonus" required>
+            <button type="submit" class="action-button">Add Class</button>
+        </form>
+
+        <!-- Popup for Updating Classes -->
+        <div class="popup-overlay">
+            <div class="popup-form" id="updateClassForm">
+                <h3>Update Class</h3>
+                <form id="classUpdateForm">
+                    <label for="update-description">Description:</label>
+                    <input type="text" id="update-description" name="description" required>
+                    <label for="update-hitDie">Hit Die:</label>
+                    <input type="number" id="update-hitDie" name="hitDie" required>
+                    <label for="update-statBonus">Stat Bonus:</label>
+                    <input type="number" id="update-statBonus" name="statBonus" required>
+                    <input type="hidden" id="update-class-id" name="class_id">
+                    <button type="submit" class="btn btn-primary">Update Class</button>
+                </form>
+                <button id="closeClassPopup">Cancel</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 DnD Session Manager. Josh Gauspohl and Leela Townsley</p>
+    </footer>
+
+    
+
+    <script>
+        // Fetch and display all classes
+        async function fetchClasses() {
+            const response = await fetch('/classes');
+            const classes = await response.json();
+    
+            const tableBody = document.querySelector('#classesTable tbody');
+            tableBody.innerHTML = '';
+    
+            classes.forEach(classItem => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${classItem.description}</td>
+                    <td>${classItem.hit_die}</td>
+                    <td>${classItem.stat_bonus}</td>
+                    <td>
+                        <button class="update-btn" data-class='${JSON.stringify(classItem)}'>Update</button>
+                        <button class="delete-btn" data-class-id="${classItem.class_id}">Delete</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Add a new class
+        document.getElementById('addClassForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const description = document.getElementById('description').value;
+            const hitDie = document.getElementById('hitDie').value;
+            const statBonus = document.getElementById('statBonus').value;
+
+            try {
+                const response = await fetch('/add-class', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ description, hitDie, statBonus })
+                });
+
+                if (response.ok) {
+                    alert('Class added successfully!');
+                    fetchClasses(); // Refresh the table
+                    this.reset();
+                } else {
+                    alert('Failed to add class.');
+                }
+            } catch (err) {
+                console.error('Error adding class:', err);
+            }
+        });
+
+        document.querySelector('#classesTable').addEventListener('click', async (e) => {
+    const target = e.target;
+
+    // Edit logic
+    if (target.classList.contains('update-btn')) {
+        const classData = JSON.parse(target.dataset.class);
+
+        // Populate the update form with class data
+        document.querySelector('#update-description').value = classData.description;
+        document.querySelector('#update-hitDie').value = classData.hit_die;
+        document.querySelector('#update-statBonus').value = classData.stat_bonus;
+        document.querySelector('#update-class-id').value = classData.class_id;
+
+        // Show the popup
+        document.querySelector('.popup-overlay').style.display = 'block';
+    }
+
+    // Delete logic
+    if (target.classList.contains('delete-btn')) {
+        const classId = target.dataset.classId; // Fetch the correct class ID from data attribute
+        if (!classId) {
+            console.error('Class ID is missing.');
+            return;
+        }
+
+        try {
+            console.log('Deleting class with ID:', classId); // Debug log for class ID
+
+            const response = await fetch('/delete-class', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ class_id: classId }), // Pass the correct parameter
+            });
+
+            if (response.ok) {
+                alert('Class deleted successfully.');
+                fetchClasses(); // Refresh the classes table
+            } else {
+                alert('Failed to delete class.');
+            }
+        } catch (err) {
+            console.error('Error deleting class:', err);
+        }
+    }
+});
+
+
+        // Update form submission 
+        document.querySelector('#classUpdateForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+
+            const response = await fetch(`/update-class/${data.class_id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                document.querySelector('.popup-overlay').style.display = 'none';
+                fetchClasses();
+            } else {
+                alert('Error updating the class.');
+            }
+        });
+
+        // Close update popup
+        document.querySelector('#closeClassPopup').addEventListener('click', () => {
+            document.querySelector('.popup-overlay').style.display = 'none';
+        });
+
+        fetchClasses();
+    </script>
+</body>
+</html>

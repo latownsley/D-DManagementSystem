@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Players - DnD Project Management</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Popup form styling */
+        .popup-form {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        .delete-btn {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        cursor: pointer;
+        font-size: 14px;
+        border-radius: 4px;
+    }
+
+    .delete-btn:hover {
+        background-color: #c82333;
+    }
+        
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Players</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="players.html">Players</a></li>
+                <li><a href="classes.html">Classes</a></li>
+                <li><a href="races.html">Races</a></li>
+                <li><a href="skills.html">Skills</a></li>
+                <li><a href="inventories.html">Inventories</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Players List</h2>
+        <div class="table-responsive">
+            <table id="playersTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Class</th>
+                        <th>Level</th>
+                        <th>Race</th>
+                        <th>XP</th>
+                        <th>HP</th>
+                        <th>Initiative</th>
+                        <th>Strength</th>
+                        <th>Dexterity</th>
+                        <th>Constitution</th>
+                        <th>Wisdom</th>
+                        <th>Charisma</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dynamic rows will be added here -->
+                </tbody>
+            </table>
+        </div>
+
+        <h3>Add a New Player</h3>
+        <form id="addPlayerForm">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="class_id">Class:</label>
+            <select id="class_id" name="class_id" required>
+                <!-- Options will be dynamically populated -->
+            </select>
+
+            <label for="level">Level:</label>
+            <input type="number" id="level" name="level" required>
+
+            <label for="race_id">Race:</label>
+            <select id="race_id" name="race_id" required>
+                <!-- Options will be dynamically populated -->
+            </select>
+
+            <label for="xp">XP:</label>
+            <input type="number" id="xp" name="xp" required>
+
+            <label for="hp">HP:</label>
+            <input type="number" id="hp" name="hp" required>
+
+            <label for="initiative">Initiative:</label>
+            <input type="number" id="initiative" name="initiative" required>
+
+            <label for="strength">Strength:</label>
+            <input type="number" id="strength" name="strength" required>
+
+            <label for="dexterity">Dexterity:</label>
+            <input type="number" id="dexterity" name="dexterity" required>
+
+            <label for="constitution">Constitution:</label>
+            <input type="number" id="constitution" name="constitution" required>
+
+            <label for="wisdom">Wisdom:</label>
+            <input type="number" id="wisdom" name="wisdom" required>
+
+            <label for="charisma">Charisma:</label>
+            <input type="number" id="charisma" name="charisma" required>
+
+            <button type="submit">Add Player</button>
+        </form>
+    </main>
+
+    <!-- Popup Form for Updating Players -->
+    <div class="popup-overlay"></div>
+    <div class="popup-form" id="updateForm">
+        <form id="updatePlayerForm">
+            <input type="hidden" id="update-player-id" name="player_id">
+
+            <label for="name">Name:</label>
+            <input type="text" id="update-name" name="name" required>
+
+            <label for="class_id">Class:</label>
+            <select id="update-class_id" name="class_id" required>
+                <!-- Options will be dynamically populated -->
+            </select>
+
+            <label for="level">Level:</label>
+            <input type="number" id="update-level" name="level" required>
+
+            <label for="race_id">Race:</label>
+            <select id="update-race_id" name="race_id" required>
+                <!-- Options will be dynamically populated -->
+            </select>
+
+            <label for="xp">XP:</label>
+            <input type="number" id="update-xp" name="xp" required>
+
+            <label for="hp">HP:</label>
+            <input type="number" id="update-hp" name="hp" required>
+
+            <label for="initiative">Initiative:</label>
+            <input type="number" id="update-initiative" name="initiative" required>
+
+            <label for="strength">Strength:</label>
+            <input type="number" id="update-strength" name="strength" required>
+
+            <label for="dexterity">Dexterity:</label>
+            <input type="number" id="update-dexterity" name="dexterity" required>
+
+            <label for="constitution">Constitution:</label>
+            <input type="number" id="update-constitution" name="constitution" required>
+
+            <label for="wisdom">Wisdom:</label>
+            <input type="number" id="update-wisdom" name="wisdom" required>
+
+            <label for="charisma">Charisma:</label>
+            <input type="number" id="update-charisma" name="charisma" required>
+
+            <button type="submit">Update Player</button>
+        </form>
+        <button id="closePopup">Cancel</button>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 DnD Session Manager. Josh Gauspohl and Leela Townsley</p>
+    </footer>
+
+    <script>
+        // Function to populate a dropdown with data from the backend
+        async function populateDropdown(endpoint, dropdownSelector, idKey, textKey) {
+            try {
+                const response = await fetch(endpoint);
+                const data = await response.json();
+                console.log(`Data fetched from ${endpoint}:`, data);
+
+                const dropdown = document.querySelector(dropdownSelector);
+                dropdown.innerHTML = '';
+
+                const defaultOption = document.createElement('option');
+                defaultOption.textContent = 'Select an option';
+                defaultOption.disabled = true;
+                defaultOption.selected = true;
+                dropdown.appendChild(defaultOption);
+
+                data.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item[idKey];
+                    option.textContent = item[textKey];
+                    dropdown.appendChild(option);
+                });
+            } catch (err) {
+                console.error(`Error populating dropdown ${dropdownSelector}:`, err);
+            }
+        }
+
+        async function loadPlayers() {
+            try {
+                const response = await fetch('/read-players');
+                const players = await response.json();
+
+                const tableBody = document.querySelector('#playersTable tbody');
+                tableBody.innerHTML = '';
+
+                players.forEach(player => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${player.name}</td>
+                        <td>${player.class_name}</td>
+                        <td>${player.level}</td>
+                        <td>${player.race_name || 'Unknown'}</td>
+                        <td>${player.xp}</td>
+                        <td>${player.hp}</td>
+                        <td>${player.initiative}</td>
+                        <td>${player.strength}</td>
+                        <td>${player.dexterity}</td>
+                        <td>${player.constitution}</td>
+                        <td>${player.wisdom}</td>
+                        <td>${player.charisma}</td>
+                        <td>
+                            <button class="update-btn action-button" data-player='${JSON.stringify(player)}'>Update</button>
+                            <button class="delete-btn action-button" data-player-id="${player.player_id}">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (err) {
+                console.error('Error loading players:', err);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await populateDropdown('/read-classes', '#class_id', 'class_id', 'description');
+            await populateDropdown('/read-races', '#race_id', 'race_id', 'name');
+            loadPlayers();
+
+            document.querySelector('#playersTable').addEventListener('click', async (e) => {
+                if (e.target.classList.contains('delete-btn')) {
+                    const playerId = e.target.dataset.playerId;
+                    await fetch('/delete-player', {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ player_id: playerId }),
+                    });
+                    loadPlayers();
+                }
+
+                if (e.target.classList.contains('update-btn')) {
+                    const player = JSON.parse(e.target.dataset.player);
+                    const form = document.querySelector('#updatePlayerForm');
+                    Object.keys(player).forEach(key => {
+                        if (form.elements[key]) {
+                            form.elements[key].value = player[key];
+                        }
+                    });
+
+                    await populateDropdown('/read-classes', '#update-class_id', 'class_id', 'description');
+                    await populateDropdown('/read-races', '#update-race_id', 'race_id', 'name');
+                    document.querySelector('#update-class_id').value = player.class_id;
+                    document.querySelector('#update-race_id').value = player.race_id;
+
+                    document.querySelector('.popup-overlay').style.display = 'block';
+                    document.querySelector('#updateForm').style.display = 'block';
+                }
+            });
+
+            document.querySelector('#closePopup').addEventListener('click', () => {
+                document.querySelector('.popup-overlay').style.display = 'none';
+                document.querySelector('#updateForm').style.display = 'none';
+            });
+
+            document.querySelector('#updatePlayerForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData.entries());
+
+                await fetch('/put-player', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+
+                document.querySelector('.popup-overlay').style.display = 'none';
+                document.querySelector('#updateForm').style.display = 'none';
+                loadPlayers();
+            });
+
+            document.querySelector('#addPlayerForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData.entries());
+
+                await fetch('/create-player', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+
+                e.target.reset();
+                loadPlayers();
+            });
+        });
+    </script>
+</body>
+</html>

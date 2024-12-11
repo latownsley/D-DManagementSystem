@@ -1,0 +1,116 @@
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #121212; 
+    color: #e0e0e0; 
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #1f1f1f; /* Darker header background */
+    color: #fff;
+    padding: 1rem;
+    text-align: center;
+}
+
+/* Navigation styling */
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    background-color: #2a2a2a;
+}
+
+nav ul li {
+    margin: 0 1rem;
+}
+
+nav ul li a {
+    color: #e0e0e0; /* Light text for links */
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    display: block;
+}
+
+nav ul li a:hover {
+    background-color: #3a3a3a; /* Darker background on hover */
+}
+
+/* Main content area styling */
+main {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background-color: #1f1f1f; /* Dark background for main content */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+}
+
+h2 {
+    text-align: center;
+    color: #e0e0e0; /* Light header color */
+}
+
+/* Table styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+table thead {
+    background-color: #333; /* Dark background for table header */
+    color: #fff;
+}
+
+table th, table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #444; /* Subtle border for rows */
+}
+
+table tbody tr:nth-child(even) {
+    background-color: #1a1a1a; /* Slightly lighter row for alternating effect */
+}
+
+table tbody tr:hover {
+    background-color: #333; /* Highlight row on hover */
+}
+
+/* Footer styling */
+footer {
+    text-align: center;
+    padding: 0.5rem;
+    font-size: 0.75rem;
+    background-color: #1f1f1f;
+    color: #e0e0e0;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    line-height: 1.2;
+}
+
+/* Responsive table wrapper */
+.table-responsive {
+    overflow-x: auto;
+}
+
+/* Buttons styling for dark theme */
+.action-button {
+    background-color: #007bff; /* Bright button color */
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 1em;
+    margin-top: 10px;
+    margin-right: 5px;
+    border-radius: 4px; /* Rounded corners */
+}
+
+.action-button:hover {
+    background-color: #0056b3; /* Darker button color on hover */
+}

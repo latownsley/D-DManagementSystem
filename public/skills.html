@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skills - DnD Project Management</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .action-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 10px;
+            margin-right: 5px;
+        }
+        .action-button:hover {
+            background-color: #0056b3;
+        }
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        .popup-form {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Skills</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="players.html">Players</a></li>
+                <li><a href="classes.html">Classes</a></li>
+                <li><a href="races.html">Races</a></li>
+                <li><a href="skills.html">Skills</a></li>
+                <li><a href="inventories.html">Inventories</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Available Skills</h2>
+        <table id="skillsTable">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamic rows will be inserted here -->
+            </tbody>
+        </table>
+
+        <h3>Add a New Skill</h3>
+        <form id="addSkillForm">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+            <label for="description">Description:</label>
+            <input type="text" id="description" name="description">
+            <button type="submit" class="action-button">Add Skill</button>
+        </form>
+
+        <!-- Popup for Updating Skills -->
+        <div class="popup-overlay"></div>
+        <div class="popup-form" id="updateSkillForm">
+            <h3>Update Skill</h3>
+            <form id="skillUpdateForm">
+                <label for="update-name">Name:</label>
+                <input type="text" id="update-name" name="name" required>
+                <label for="update-description">Description:</label>
+                <input type="text" id="update-description" name="description">
+                <input type="hidden" id="update-skill-id" name="skill_id">
+                <button type="submit" class="action-button">Update Skill</button>
+            </form>
+            <button id="closePopup" class="action-button">Cancel</button>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 DnD Session Manager. Josh Gauspohl and Leela Townsley</p>
+    </footer>
+
+    <script>
+        async function fetchSkills() {
+            const response = await fetch('/read-skills');
+            const skills = await response.json();
+
+            const tableBody = document.querySelector('#skillsTable tbody');
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            skills.forEach(skill => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${skill.name}</td>
+                    <td>${skill.description || 'N/A'}</td>
+                    <td>
+                        <button class="action-button update-btn" data-skill='${JSON.stringify(skill)}'>Edit</button>
+                        <button class="action-button delete-btn" data-skill-id="${skill.skill_id}">Delete</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Add a new skill
+        document.getElementById('addSkillForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const description = document.getElementById('description').value;
+
+            await fetch('/create-skill', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, description })
+            });
+
+            fetchSkills();
+            e.target.reset();
+        });
+
+        // Handle Edit and Delete buttons
+        document.querySelector('#skillsTable').addEventListener('click', (e) => {
+            const target = e.target;
+
+            // Edit logic
+            if (target.classList.contains('update-btn')) {
+                const skill = JSON.parse(target.dataset.skill);
+
+                document.querySelector('#update-name').value = skill.name;
+                document.querySelector('#update-description').value = skill.description;
+                document.querySelector('#update-skill-id').value = skill.skill_id;
+
+                document.querySelector('.popup-overlay').style.display = 'block';
+                document.querySelector('#updateSkillForm').style.display = 'block';
+            }
+
+            // Delete logic
+            if (target.classList.contains('delete-btn')) {
+                const skillId = target.dataset.skillId;
+
+                fetch('/delete-skill', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ skill_id: skillId })
+                }).then(() => fetchSkills());
+            }
+        });
+
+        // Update a skill
+        document.querySelector('#skillUpdateForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+
+            await fetch(`/update-skill/${data.skill_id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            document.querySelector('.popup-overlay').style.display = 'none';
+            document.querySelector('#updateSkillForm').style.display = 'none';
+            fetchSkills();
+        });
+
+        // Close popup functionality
+        document.querySelector('#closePopup').addEventListener('click', () => {
+            document.querySelector('.popup-overlay').style.display = 'none';
+            document.querySelector('#updateSkillForm').style.display = 'none';
+        });
+
+        // Load skills on page load
+        fetchSkills();
+    </script>
+</body>
+</html>
